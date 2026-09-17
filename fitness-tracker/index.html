@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitTrack — Gym Session Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">💪</span>
+      <span class="brand-name">FitTrack</span>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="tab-btn" data-tab="log">Log Session</button>
+      <button class="tab-btn" data-tab="history">History</button>
+    </nav>
+    <div class="topbar-actions">
+      <button id="exportBtn" class="icon-btn" title="Export data">⭳ Export</button>
+      <label class="icon-btn" title="Import data">
+        ⭱ Import
+        <input type="file" id="importInput" accept="application/json" hidden />
+      </label>
+      <button id="themeToggle" class="icon-btn" title="Toggle theme">🌙</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Dashboard -->
+    <section id="dashboard" class="tab-panel active">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-label">Total Sessions</div>
+        </div>
+        <div class="stat-card highlight">
+          <div class="stat-value" id="statStreak">0</div>
+          <div class="stat-label">Current Streak (days)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statLongest">0</div>
+          <div class="stat-label">Longest Streak</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statWeek">0</div>
+          <div class="stat-label">This Week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statMinutes">0</div>
+          <div class="stat-label">Total Minutes</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Weekly Goal</h2>
+          <span id="goalText" class="muted"></span>
+        </div>
+        <div class="goal-row">
+          <input type="range" id="goalSlider" min="1" max="7" value="3" />
+          <div class="goal-progress">
+            <div id="goalBar" class="goal-bar-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Sessions per Week</h2></div>
+        <canvas id="weeklyChart" height="160"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Consistency (last 18 weeks)</h2></div>
+        <div id="heatmap" class="heatmap"></div>
+        <div class="heatmap-legend">
+          <span>Less</span>
+          <span class="hm-cell hm-0"></span>
+          <span class="hm-cell hm-1"></span>
+          <span class="hm-cell hm-2"></span>
+          <span class="hm-cell hm-3"></span>
+          <span>More</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Log Session -->
+    <section id="log" class="tab-panel">
+      <div class="card">
+        <div class="card-header"><h2 id="formTitle">Log a Gym Session</h2></div>
+        <form id="sessionForm" class="form-grid">
+          <input type="hidden" id="editId" />
+
+          <label>
+            Date
+            <input type="date" id="fDate" required />
+          </label>
+
+          <label>
+            Workout Type
+            <select id="fType">
+              <option>Strength</option>
+              <option>Cardio</option>
+              <option>HIIT</option>
+              <option>Yoga / Mobility</option>
+              <option>Sports</option>
+              <option>Other</option>
+            </select>
+          </label>
+
+          <label>
+            Duration (minutes)
+            <input type="number" id="fDuration" min="1" max="600" value="60" required />
+          </label>
+
+          <label>
+            Perceived Effort (1-10)
+            <input type="number" id="fEffort" min="1" max="10" value="7" required />
+          </label>
+
+          <label class="full">
+            Exercises / Notes
+            <textarea id="fNotes" rows="3" placeholder="e.g. Squat 5x5 @80kg, Bench 3x8, 20 min run..."></textarea>
+          </label>
+
+          <div class="form-actions full">
+            <button type="submit" class="btn primary" id="submitBtn">Save Session</button>
+            <button type="button" class="btn" id="cancelEditBtn" hidden>Cancel Edit</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- History -->
+    <section id="history" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h2>Session History</h2>
+          <input type="search" id="historySearch" placeholder="Search notes or type..." />
+        </div>
+        <div id="historyList" class="history-list"></div>
+        <p id="emptyState" class="muted" hidden>No sessions yet. Log your first workout!</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
