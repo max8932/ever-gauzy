@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Schach-Kurse Tracker</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%99%9E%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <h1><span class="piece">♞</span> Schach-Kurse Tracker</h1>
+      <p class="subtitle">Behalte den Überblick über deine Schachkurse und deinen Fortschritt</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="stats" id="stats">
+      <div class="stat-card">
+        <span class="stat-value" id="statTotal">0</span>
+        <span class="stat-label">Kurse</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="statInProgress">0</span>
+        <span class="stat-label">In Bearbeitung</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="statCompleted">0</span>
+        <span class="stat-label">Abgeschlossen</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="statAvgProgress">0%</span>
+        <span class="stat-label">Ø Fortschritt</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Neuen Kurs hinzufügen</h2>
+      </div>
+      <form id="courseForm" class="course-form">
+        <div class="field">
+          <label for="title">Kurstitel *</label>
+          <input type="text" id="title" required placeholder="z. B. Sizilianisch Meistern" />
+        </div>
+        <div class="field">
+          <label for="platform">Plattform / Trainer</label>
+          <input type="text" id="platform" placeholder="z. B. Chessable, Lichess, GM Müller" />
+        </div>
+        <div class="field">
+          <label for="category">Kategorie</label>
+          <select id="category">
+            <option value="Eröffnung">Eröffnung</option>
+            <option value="Mittelspiel">Mittelspiel</option>
+            <option value="Endspiel">Endspiel</option>
+            <option value="Taktik">Taktik</option>
+            <option value="Strategie">Strategie</option>
+            <option value="Sonstiges">Sonstiges</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="level">Niveau</label>
+          <select id="level">
+            <option value="Anfänger">Anfänger</option>
+            <option value="Fortgeschritten">Fortgeschritten</option>
+            <option value="Experte">Experte</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="totalLessons">Anzahl Lektionen *</label>
+          <input type="number" id="totalLessons" min="1" required placeholder="z. B. 20" />
+        </div>
+        <div class="field">
+          <label for="link">Link (optional)</label>
+          <input type="url" id="link" placeholder="https://..." />
+        </div>
+        <div class="field field-wide">
+          <label for="notes">Notizen</label>
+          <textarea id="notes" rows="2" placeholder="Eigene Notizen zum Kurs..."></textarea>
+        </div>
+        <button type="submit" class="btn-primary">Kurs hinzufügen</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header toolbar">
+        <h2>Meine Kurse</h2>
+        <div class="toolbar-actions">
+          <input type="search" id="search" placeholder="Kurse durchsuchen..." />
+          <select id="filterStatus">
+            <option value="all">Alle Status</option>
+            <option value="not-started">Nicht begonnen</option>
+            <option value="in-progress">In Bearbeitung</option>
+            <option value="completed">Abgeschlossen</option>
+          </select>
+          <select id="sortBy">
+            <option value="recent">Zuletzt hinzugefügt</option>
+            <option value="progress">Fortschritt</option>
+            <option value="title">Titel (A-Z)</option>
+          </select>
+          <button id="exportBtn" class="btn-secondary" title="Daten als JSON exportieren">Export</button>
+          <label class="btn-secondary file-label" title="Daten aus JSON importieren">
+            Import
+            <input type="file" id="importInput" accept="application/json" hidden />
+          </label>
+        </div>
+      </div>
+      <div id="courseList" class="course-list"></div>
+      <p id="emptyState" class="empty-state">Noch keine Kurse vorhanden. Füge oben deinen ersten Schachkurs hinzu!</p>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>Alle Daten werden ausschließlich lokal in deinem Browser gespeichert (localStorage) — keine Anmeldung nötig.</p>
+  </footer>
+
+  <template id="courseCardTemplate">
+    <article class="course-card" data-id="">
+      <div class="card-top">
+        <div>
+          <h3 class="card-title"></h3>
+          <div class="card-meta">
+            <span class="badge category"></span>
+            <span class="badge level"></span>
+            <span class="platform"></span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn edit-btn" title="Bearbeiten">✎</button>
+          <button class="icon-btn delete-btn" title="Löschen">✕</button>
+        </div>
+      </div>
+
+      <p class="card-notes"></p>
+      <a class="card-link" target="_blank" rel="noopener noreferrer">Kurs öffnen ↗</a>
+
+      <div class="progress-section">
+        <div class="progress-row">
+          <label>Lektionen: <span class="lessons-done">0</span> / <span class="lessons-total">0</span></label>
+          <span class="progress-percent">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <div class="progress-controls">
+          <button class="icon-btn decrement">−</button>
+          <input type="range" class="progress-slider" min="0" max="0" value="0" />
+          <button class="icon-btn increment">+</button>
+        </div>
+      </div>
+
+      <span class="status-badge"></span>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
